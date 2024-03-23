@@ -246,7 +246,262 @@ skills_list = [
     "MySQL"
 ]
 
-def extract_text_sections(pdf,skills_list):
+soft_skills = [
+    "Communication",
+    "Collaboration",
+    "Teamwork",
+    "Leadership",
+    "Problem Solving",
+    "Creativity",
+    "Adaptability",
+    "Flexibility",
+    "Time Management",
+    "Organization",
+    "Critical Thinking",
+    "Emotional Intelligence",
+    "Empathy",
+    "Stress Management",
+    "Resilience",
+    "Conflict Resolution",
+    "Decision Making",
+    "Interpersonal Skills",
+    "Presentation Skills",
+    "Public Speaking",
+    "Negotiation",
+    "Active Listening",
+    "Innovation",
+    "Initiative",
+    "Motivation",
+    "Self-Discipline",
+    "Attention to Detail",
+    "Patience",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Team Building",
+    "Feedback",
+    "Empowerment",
+    "Mentorship",
+    "Coaching",
+    "Delegation",
+    "Empowerment",
+    "Time Management",
+    "Problem Solving",
+    "Decision Making",
+    "Emotional Intelligence",
+    "Adaptability",
+    "Flexibility",
+    "Creativity",
+    "Innovation",
+    "Leadership",
+    "Teamwork",
+    "Communication",
+    "Active Listening",
+    "Conflict Resolution",
+    "Interpersonal Skills",
+    "Networking",
+    "Collaboration",
+    "Critical Thinking",
+    "Attention to Detail",
+    "Organizational Skills",
+    "Initiative",
+    "Motivation",
+    "Self-Discipline",
+    "Resilience",
+    "Stress Management",
+    "Time Management",
+    "Adaptability",
+    "Flexibility",
+    "Problem Solving",
+    "Decision Making",
+    "Creativity",
+    "Innovation",
+    "Leadership",
+    "Teamwork",
+    "Communication",
+    "Active Listening",
+    "Interpersonal Skills",
+    "Presentation Skills",
+    "Negotiation",
+    "Conflict Resolution",
+    "Empathy",
+    "Emotional Intelligence",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Accountability",
+    "Responsibility",
+    "Time Management",
+    "Organization",
+    "Attention to Detail",
+    "Analytical Thinking",
+    "Critical Thinking",
+    "Problem Solving",
+    "Decision Making",
+    "Initiative",
+    "Innovation",
+    "Adaptability",
+    "Flexibility",
+    "Resilience",
+    "Stress Management",
+    "Communication",
+    "Interpersonal Skills",
+    "Leadership",
+    "Teamwork",
+    "Collaboration",
+    "Motivation",
+    "Emotional Intelligence",
+    "Empathy",
+    "Conflict Resolution",
+    "Negotiation",
+    "Feedback",
+    "Coaching",
+    "Mentorship",
+    "Time Management",
+    "Prioritization",
+    "Delegation",
+    "Organization",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Creativity",
+    "Innovation",
+    "Problem Solving",
+    "Analytical Skills",
+    "Decision Making",
+    "Risk Management",
+    "Change Management",
+    "Continuous Learning",
+    "Adaptability",
+    "Flexibility",
+    "Resilience",
+    "Stress Management",
+    "Communication",
+    "Interpersonal Skills",
+    "Leadership",
+    "Teamwork",
+    "Collaboration",
+    "Motivation",
+    "Emotional Intelligence",
+    "Empathy",
+    "Conflict Resolution",
+    "Negotiation",
+    "Feedback",
+    "Coaching",
+    "Mentorship",
+    "Time Management",
+    "Prioritization",
+    "Delegation",
+    "Organization",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Creativity",
+    "Innovation",
+    "Problem Solving",
+    "Analytical Skills",
+    "Decision Making",
+    "Risk Management",
+    "Change Management",
+    "Continuous Learning",
+    "Adaptability",
+    "Flexibility",
+    "Resilience",
+    "Stress Management",
+    "Communication",
+    "Interpersonal Skills",
+    "Leadership",
+    "Teamwork",
+    "Collaboration",
+    "Motivation",
+    "Emotional Intelligence",
+    "Empathy",
+    "Conflict Resolution",
+    "Negotiation",
+    "Feedback",
+    "Coaching",
+    "Mentorship",
+    "Time Management",
+    "Prioritization",
+    "Delegation",
+    "Organization",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Creativity",
+    "Innovation",
+    "Problem Solving",
+    "Analytical Skills",
+    "Decision Making",
+    "Risk Management",
+    "Change Management",
+    "Continuous Learning",
+    "Adaptability",
+    "Flexibility",
+    "Resilience",
+    "Stress Management",
+    "Communication",
+    "Interpersonal Skills",
+    "Leadership",
+    "Teamwork",
+    "Collaboration",
+    "Motivation",
+    "Emotional Intelligence",
+    "Empathy",
+    "Conflict Resolution",
+    "Negotiation",
+    "Feedback",
+    "Coaching",
+    "Mentorship",
+    "Time Management",
+    "Prioritization",
+    "Delegation",
+    "Organization",
+    "Professionalism",
+    "Ethics",
+    "Integrity",
+    "Cultural Sensitivity",
+    "Diversity and Inclusion",
+    "Open-Mindedness",
+    "Positive Attitude",
+    "Creativity",
+    "Innovation",
+    "Problem Solving",
+    "Analytical Skills",
+    "Decision Making",
+    "Risk Management",
+    "Change Management",
+    "Continuous Learning",
+    "Adaptability",
+    "Flexibility",
+    "Resilience",
+    "Stress Management",
+    "Communication",
+    "Interpersonal Skills",
+    "Leaders"
+]
+
+def extract_text_sections(pdf,skills_list,soft_skills):
     text_sections = []
     
     with pdfplumber.open(pdf) as pdf:
@@ -254,13 +509,26 @@ def extract_text_sections(pdf,skills_list):
             # Extraire le texte de la page
             text = page.extract_text()
             
-            skills = []
+            skills = set()
 
             for skill in skills_list:
                 pattern = r"\b{}\b".format(re.escape(skill))
                 match = re.search(pattern, text, re.IGNORECASE)
                 if match:
-                    skills.append(skill)
+                    skills.add(skill) 
+
+
+            softskills = set()
+
+            for sfskill in soft_skills:
+                pattern = r"\b{}\b".format(re.escape(sfskill))
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    softskills.add(sfskill) 
+
+
+
+            
             
             email = None
 
@@ -288,13 +556,13 @@ def extract_text_sections(pdf,skills_list):
 
             
             # Séparer le texte en sections basées sur les sauts de ligne ou d'autres délimiteurs
-            sections = text.split("\n")  # Vous pouvez utiliser d'autres délimiteurs si nécessaire
+            # sections = text.split("\n")  # Vous pouvez utiliser d'autres délimiteurs si nécessaire
 
             
             # Ajouter les sections de texte de la page à la liste globale
-            text_sections.extend(sections)
+            # text_sections.extend(sections)
     
-    return skills,contact_number,email
+    return list(skills),contact_number,email,list(softskills)
 
 @app.route('/extract_text', methods=['POST'])
 def extract_text():
@@ -306,9 +574,9 @@ def extract_text():
     pdf_file = request.files['file']
 
     # Extraire les sections de texte du PDF
-    skills,contact_number,email = extract_text_sections(pdf_file,skills_list)
+    skills,contact_number,email,softSkills = extract_text_sections(pdf_file,skills_list,soft_skills)
     # Renvoyer les sections de texte extraites
-    return {'skills': skills,'contact number:':contact_number,'email':email}
+    return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills}
 
 if __name__ == '__main__':
     app.run(debug=True)
