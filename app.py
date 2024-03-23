@@ -5,9 +5,92 @@ import re
 
 
 
+
 app = Flask(__name__)
 CORS(app)  
 
+
+
+def extract_text_sections(pdf,skills_list,soft_skills):
+    # text_sections = []
+    
+    with pdfplumber.open(pdf) as pdf:
+        for page in pdf.pages:
+            # Extraire le texte de la page
+            text = page.extract_text()
+            
+            skills = set()
+
+            for skill in skills_list:
+                pattern = r"\b{}\b".format(re.escape(skill))
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    skills.add(skill) 
+
+
+            softskills = set()
+
+            for sfskill in soft_skills:
+                pattern = r"\b{}\b".format(re.escape(sfskill))
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    softskills.add(sfskill) 
+
+
+            email = None
+
+            # Use regex pattern to find a potential email address
+            pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
+            match = re.search(pattern, text)
+            if match:
+                email = match.group()
+            print(email)
+
+
+            contact_number = None
+
+        # Utiliser le motif regex pour trouver un éventuel numéro de contact
+            pattern = r"\+?\d{3}\s?\d{9}"
+            match = re.search(pattern, text)
+            if match:
+                 contact_number = match.group()
+
+            print(contact_number)
+
+        langues_detectees = []
+        # Parcourir chaque langue dans la liste de langues
+        for langue in langues_liste:
+            # Vérifier si le nom de la langue est présent dans le texte
+            if langue.lower() in text.lower():
+                # Ajouter le nom de la langue à la liste des langues détectées
+                langues_detectees.append(langue)
+    
+    return list(skills),contact_number,email,list(softskills),langues_detectees
+
+@app.route('/extract_text', methods=['POST'])
+def extract_text():
+    # Vérifier si un fichier PDF est fourni
+    if 'file' not in request.files:
+        return jsonify({'error': 'No PDF file provided'})
+
+    # Récupérer le fichier PDF depuis la requête
+    pdf_file = request.files['file']
+
+    # Extraire les sections de texte du PDF
+    skills,contact_number,email,softSkills,Langues = extract_text_sections(pdf_file,skills_list,soft_skills)
+    # Renvoyer les sections de texte extraites
+    return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills,'langues':Langues}
+
+
+
+langues_liste = [
+    "Anglais",
+    "Français",
+    "Espagnol",
+    "Allemand",
+    "Italien",
+    "Arabe"
+]
 skills_list = [
     # Salesforce
     "CRM",
@@ -501,83 +584,6 @@ soft_skills = [
     "Leaders"
 ]
 
-def extract_text_sections(pdf,skills_list,soft_skills):
-    text_sections = []
-    
-    with pdfplumber.open(pdf) as pdf:
-        for page in pdf.pages:
-            # Extraire le texte de la page
-            text = page.extract_text()
-            
-            skills = set()
-
-            for skill in skills_list:
-                pattern = r"\b{}\b".format(re.escape(skill))
-                match = re.search(pattern, text, re.IGNORECASE)
-                if match:
-                    skills.add(skill) 
-
-
-            softskills = set()
-
-            for sfskill in soft_skills:
-                pattern = r"\b{}\b".format(re.escape(sfskill))
-                match = re.search(pattern, text, re.IGNORECASE)
-                if match:
-                    softskills.add(sfskill) 
-
-
-
-            
-            
-            email = None
-
-            # Use regex pattern to find a potential email address
-            pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-            match = re.search(pattern, text)
-            if match:
-                email = match.group()
-            print(email)
-
-
-
-            contact_number = None
-
-        # Utiliser le motif regex pour trouver un éventuel numéro de contact
-            pattern = r"\+?\d{3}\s?\d{9}"
-            match = re.search(pattern, text)
-            if match:
-                 contact_number = match.group()
-
-            print(contact_number)
-
-            
-
-
-            
-            # Séparer le texte en sections basées sur les sauts de ligne ou d'autres délimiteurs
-            # sections = text.split("\n")  # Vous pouvez utiliser d'autres délimiteurs si nécessaire
-
-            
-            # Ajouter les sections de texte de la page à la liste globale
-            # text_sections.extend(sections)
-    
-    return list(skills),contact_number,email,list(softskills)
-
-@app.route('/extract_text', methods=['POST'])
-def extract_text():
-    # Vérifier si un fichier PDF est fourni
-    if 'file' not in request.files:
-        return jsonify({'error': 'No PDF file provided'})
-
-    # Récupérer le fichier PDF depuis la requête
-    pdf_file = request.files['file']
-
-    # Extraire les sections de texte du PDF
-    skills,contact_number,email,softSkills = extract_text_sections(pdf_file,skills_list,soft_skills)
-    # Renvoyer les sections de texte extraites
-    return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills}
-
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host="0.0.0.0", port=10000)
     print('API star')
