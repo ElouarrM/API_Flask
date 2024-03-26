@@ -154,6 +154,6 @@ soft_skills = ["Communication", "Collaboration", "Teamwork", "Leadership", "Prob
 
    
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
     print('API star')
     
