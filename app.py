@@ -142,26 +142,6 @@ def extract_text():
     # Renvoyer les sections de texte extraites
     return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills,'langues':Langues,'Name':full_name}
 
-@app.route('/mass_extract_text', methods=['POST'])
-def mass_extract_text():
-    if 'files[0]' not in request.files:
-        return jsonify({'error': 'No PDF files provided'})
-
-    pdf_files = []
-    for i in range(len(request.files)):
-        pdf_file = request.files.get(f'files[{i}]')
-        if pdf_file:
-            pdf_files.append(pdf_file)
-
-    responses = []
-
-    for pdf_file in pdf_files:
-        filename = pdf_file.filename
-        full_name = extract_full_name_from_pdf(filename)
-        skills, contact_number, email, softSkills, Langues = extract_text_sections(pdf_file, skills_list, soft_skills)
-        responses.append({'skills': skills, 'contact number': contact_number, 'email': email, 'soft skills': softSkills, 'langues': Langues, 'Name': full_name})
-
-    return jsonify(responses)
 
 
 
