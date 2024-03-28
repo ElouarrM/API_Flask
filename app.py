@@ -144,7 +144,9 @@ def extract_text():
 
 @app.route('/mass_extract_text', methods=['POST'])
 def mass_extract_text():
-  
+   if 'files[0]' not in request.files:
+        return jsonify({'error': 'No PDF files provided'})
+       
     pdf_files = []
     for i in range(len(request.files)):
         pdf_file = request.files.get(f'files[{i}]')
