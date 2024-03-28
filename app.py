@@ -106,7 +106,8 @@ def extract_text_sections(pdf,skills_list,soft_skills):
 
             contact_number = None
             # Utiliser le motif regex pour trouver un éventuel numéro de téléphone
-            pattern = r"\+?\d{1,3}[-.\s]?\(?(5[0-9]{2})\)?[-.\s]?\d{3}[-.\s]?\d{3}\b|\+212[-.\s]?\d{3}[-.\s]?\d{3}[-.\s]?\d{3}\b"
+            pattern = r"\+?\d{1,3}[-.\s]?\(?(5[0-9]{2})\)?[-.\s]?\d{3}[-.\s]?\d{3}\b|\+212[-.\s]?\d{3}[-.\s]?\d{3}[-.\s]?\d{3}\b|\b\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}\b"
+
             match = re.search(pattern, text)
             if match:
                 contact_number = match.group()
@@ -140,6 +141,27 @@ def extract_text():
     skills,contact_number,email,softSkills,Langues = extract_text_sections(pdf_file,skills_list,soft_skills)
     # Renvoyer les sections de texte extraites
     return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills,'langues':Langues,'Name':full_name}
+
+@app.route('/mass_extract_text', methods=['POST'])
+def mass_extract_text():
+    if 'files[0]' not in request.files:
+        return jsonify({'error': 'No PDF files provided'})
+
+    pdf_files = []
+    for i in range(len(request.files)):
+        pdf_file = request.files.get(f'files[{i}]')
+        if pdf_file:
+            pdf_files.append(pdf_file)
+
+    responses = []
+
+    for pdf_file in pdf_files:
+        filename = pdf_file.filename
+        full_name = extract_full_name_from_pdf(filename)
+        skills, contact_number, email, softSkills, Langues = extract_text_sections(pdf_file, skills_list, soft_skills)
+        responses.append({'skills': skills, 'contact number': contact_number, 'email': email, 'soft skills': softSkills, 'langues': Langues, 'Name': full_name})
+
+    return jsonify(responses)
 
 
 
