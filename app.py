@@ -71,7 +71,7 @@ def extract_name_from_metadata(filename):
 
 
 
-def extract_text_sections(pdf,skills_list,soft_skills):
+def extract_text_sections(pdf,skills_list,soft_skills,certifications_salesforce):
     with pdfplumber.open(pdf) as pdf:
         for page in pdf.pages:
             # Extraire le texte de la page
@@ -83,6 +83,14 @@ def extract_text_sections(pdf,skills_list,soft_skills):
                 match = re.search(pattern, text, re.IGNORECASE)
                 if match:
                     skills.add(skill) 
+            
+            SalesforceCertif = set()
+
+            for certif in certifications_salesforce:
+                pattern = r"\b{}\b".format(re.escape(certif))
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    SalesforceCertif.add(certif) 
 
 
             softskills = set()
@@ -121,8 +129,9 @@ def extract_text_sections(pdf,skills_list,soft_skills):
             if langue.lower() in text.lower():
                 # Ajouter le nom de la langue à la liste des langues détectées
                 langues_detectees.append(langue)
+        
     
-    return list(skills),contact_number,email,list(softskills),langues_detectees
+    return list(skills),contact_number,email,list(softskills),langues_detectees,list(SalesforceCertif)
 
 @app.route('/extract_text', methods=['POST'])
 def extract_text():
@@ -138,11 +147,31 @@ def extract_text():
     full_name = extract_full_name_from_pdf(filename)
 
     # Extraire les sections de texte du PDF
-    skills,contact_number,email,softSkills,Langues = extract_text_sections(pdf_file,skills_list,soft_skills)
+    skills, contact_number, email, softSkills, Langues,salesforcecertification = extract_text_sections(pdf_file, skills_list, soft_skills,certifications_salesforce)
     # Renvoyer les sections de texte extraites
-    return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills,'langues':Langues,'Name':full_name}
+    return {'skills': skills,'contact number:':contact_number,'email':email,'soft skills':softSkills,'langues':Langues,'Name':full_name,'certifications':salesforcecertification}
 
 
+@app.route('/mass_extract_text', methods=['POST'])
+def mass_extract_text():
+    if 'files[0]' not in request.files:
+        return jsonify({'error': 'No PDF files provided'})
+
+    pdf_files = []
+    for i in range(len(request.files)):
+        pdf_file = request.files.get(f'files[{i}]')
+        if pdf_file:
+            pdf_files.append(pdf_file)
+
+    responses = []
+
+    for pdf_file in pdf_files:
+        filename = pdf_file.filename
+        full_name = extract_full_name_from_pdf(filename)
+        skills, contact_number, email, softSkills, Langues,salesforcecertification = extract_text_sections(pdf_file, skills_list, soft_skills,certifications_salesforce)
+        responses.append({'skills': skills, 'contact number': contact_number, 'email': email, 'soft skills': softSkills, 'langues': Langues, 'Name': full_name,'certifications':salesforcecertification})
+
+    return jsonify(responses)
 
 
 langues_liste = [
@@ -153,7 +182,8 @@ skills_list = ["CRM","Mulesoft", "Service Cloud", "Marketing Cloud", "Sales Clou
 
 soft_skills = ["Communication", "Collaboration", "Teamwork", "Leadership", "Problem Solving", "Creativity", "Adaptability", "Flexibility", "Time Management", "Organization", "Critical Thinking", "Emotional Intelligence", "Empathy", "Stress Management", "Resilience", "Conflict Resolution", "Decision Making", "Interpersonal Skills", "Presentation Skills", "Public Speaking", "Negotiation", "Active Listening", "Innovation", "Initiative", "Motivation", "Self-Discipline", "Attention to Detail", "Patience", "Open-Mindedness", "Positive Attitude", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Team Building", "Feedback", "Empowerment", "Mentorship", "Coaching", "Delegation", "Time Management", "Problem Solving", "Decision Making", "Emotional Intelligence", "Adaptability", "Flexibility", "Creativity", "Innovation", "Leadership", "Teamwork", "Communication", "Active Listening", "Conflict Resolution", "Interpersonal Skills", "Networking", "Collaboration", "Critical Thinking", "Attention to Detail", "Organizational Skills", "Initiative", "Motivation", "Self-Discipline", "Resilience", "Stress Management", "Time Management", "Adaptability", "Flexibility", "Problem Solving", "Decision Making", "Creativity", "Innovation", "Leadership", "Teamwork", "Communication", "Active Listening", "Interpersonal Skills", "Presentation Skills", "Negotiation", "Conflict Resolution", "Empathy", "Emotional Intelligence", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Professionalism", "Ethics", "Integrity", "Accountability", "Responsibility", "Time Management", "Organization", "Attention to Detail", "Analytical Thinking", "Critical Thinking", "Problem Solving", "Decision Making", "Initiative", "Innovation", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural Sensitivity", "Diversity and Inclusion", "Open-Mindedness", "Positive Attitude", "Creativity", "Innovation", "Problem Solving", "Analytical Skills", "Decision Making", "Risk Management", "Change Management", "Continuous Learning", "Adaptability", "Flexibility", "Resilience", "Stress Management", "Communication", "Interpersonal Skills", "Leadership", "Teamwork", "Collaboration", "Motivation", "Emotional Intelligence", "Empathy", "Conflict Resolution", "Negotiation", "Feedback", "Coaching", "Mentorship", "Time Management", "Prioritization", "Delegation", "Organization", "Professionalism", "Ethics", "Integrity", "Cultural", "Leaders"]
 
-
+certifications_salesforce = [
+    "Salesforce Administrator", "Salesforce Advanced Administrator", "Salesforce Platform App Builder", "Salesforce Platform Developer I", "Salesforce Platform Developer II", "Salesforce Sales Cloud Consultant", "Salesforce Service Cloud Consultant", "Salesforce Marketing Cloud Email Specialist", "Salesforce Marketing Cloud Consultant", "Salesforce Pardot Specialist", "Salesforce CPQ Specialist", "Salesforce Field Service Lightning Consultant", "Salesforce Community Cloud Consultant", "Salesforce Sharing and Visibility Designer", "Salesforce Data Architecture and Management Designer", "Salesforce Identity and Access Management Designer", "Salesforce Integration Architecture Designer", "Salesforce Development Lifecycle and Deployment Designer", "Salesforce Einstein Analytics and Discovery Consultant", "Salesforce Marketing Cloud Administrator", "Salesforce Marketing Cloud Developer",  "Salesforce B2C Commerce Developer", "Salesforce B2C Solution Architect", "Salesforce Heroku Architecture Designer", "Salesforce JavaScript Developer I", "Salesforce Marketing Cloud Developer II", "Salesforce Marketing Cloud Administrator", "Salesforce Tableau CRM and Einstein Discovery Consultant", "Salesforce Administrator Marketing Cloud", "Salesforce Administrator Service Cloud", "Salesforce JavaScript Developer II", "Salesforce Lightning Component Framework Specialist", "Salesforce Marketing Cloud Consultant", "Salesforce Mobile Solutions Architecture Designer", "Salesforce Nonprofit Cloud Consultant", "Salesforce OmniStudio Developer", "Salesforce Order Management Designer", "Salesforce Pardot Consultant", "Salesforce Platform Developer I", "Salesforce Platform Developer II", "Salesforce Platform App Builder", "Salesforce Sales Cloud Consultant", "Salesforce Service Cloud Consultant", "Salesforce Sharing and Visibility Designer", "Salesforce Einstein Analytics and Discovery Consultant", "Salesforce Identity and Access Management Designer", "Salesforce Data Architecture and Management Designer", "Salesforce System Architect", "Salesforce Application Architect", "Salesforce Integration Architecture Designer", "Salesforce Development Lifecycle and Deployment Designer", "Salesforce Mobile Solutions Architecture Designer", "Salesforce Heroku Architecture Designer", "Salesforce Technical Architect", "Salesforce CPQ Specialist", "Salesforce Field Service Lightning Consultant", "Salesforce Marketing Cloud Consultant", "Salesforce Marketing Cloud Developer", "Salesforce Marketing Cloud Administrator", "Salesforce B2C Commerce Developer", "Salesforce B2C Solution Architect", "Salesforce JavaScript Developer I", "Salesforce Marketing Cloud Developer II", "Salesforce Marketing Cloud Administrator", "Salesforce Tableau CRM and Einstein Discovery Consultant", "Salesforce Administrator Marketing Cloud", "Salesforce Administrator Service Cloud", "Salesforce JavaScript Developer II", "Salesforce Lightning Component Framework Specialist", "Salesforce Marketing Cloud Consultant", "Salesforce Nonprofit Cloud Consultant", "Salesforce OmniStudio Developer", "Salesforce Order Management Designer", "Salesforce Pardot Consultant"]
    
 if __name__ == '__main__':
     app.run(debug=True)
