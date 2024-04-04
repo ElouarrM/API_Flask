@@ -114,7 +114,7 @@ def extract_text_sections(pdf,skills_list,soft_skills,certifications_salesforce)
 
             contact_number = None
             # Utiliser le motif regex pour trouver un éventuel numéro de téléphone
-            pattern = r"\+?\d{1,3}[-.\s]?\(?(5[0-9]{2})\)?[-.\s]?\d{3}[-.\s]?\d{3}\b|\+212[-.\s]?\d{3}[-.\s]?\d{3}[-.\s]?\d{3}\b|\b\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}\b"
+            pattern = r"\+?\d{1,3}[-.\s]?\(?(5[0-9]{2})\)?[-.\s]?\d{3}[-.\s]?\d{3}\b|\+212[-.\s]?\d{3}[-.\s]?\d{3}[-.\s]?\d{3}\b|\b\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}\b|\+?\d{1,3}[-.\s]?\(?(?:(?:\d{2}[-.\s]?){4}\d{2}|\d{10})\)?|\b(?:\+?212?[-.\s]?)?6[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}[-.\s]?\d{2}\b"
 
             match = re.search(pattern, text)
             if match:
